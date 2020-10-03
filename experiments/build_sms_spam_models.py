@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 
 import pipeline_one as p1
+import pipeline_two as p2
 
 df = pd.read_csv("../data/smsspam/SMSSpamCollection", sep="\t", header=None)
 
@@ -21,7 +22,6 @@ x = train['text'].tolist()
 
 pipe1 = p1.PipelineOne()
 model = pipe1.fit(x,y)
-
 
 y = np.array(df['label'])
 x = df['text'].tolist()
