@@ -1,6 +1,7 @@
 import pandas as pd
+import re
 
-dict_file = "51155-0.txt2"
+dict_file = "temp.txt"
 dictionary = {}
 CURRENT_KEY = ""
 process_started = False
@@ -20,6 +21,12 @@ def initialise_new_record(content):
 def finalise():
     print(dictionary)
     exit(1)
+
+##################################################################
+def clean(x):
+    temp = re.sub('\{\[(.*)\]\?\}', '\\1', x)    
+    temp2 = re.sub('\.','',temp)
+    return temp2
 
 ##################################################################
 def update_content(starter, content, stripped_line):
@@ -63,6 +70,7 @@ with open(dict_file, "r") as f:
     for line in f:
         print("PROCESSING:", line)
         stripped_line = line.strip()
+        stripped_line = clean(stripped_line)
         starter = stripped_line[0:4]
         content = stripped_line[5:]
         if starter == "KEY:":
