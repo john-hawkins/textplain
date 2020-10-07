@@ -10,14 +10,24 @@
 ###################################################################################################################
 
 def explain_predictions(model, dataset, column, params):
+
+    if str(type(column)) != "<class 'str'>":
+        raise Exception("ERROR: Column name must be a string") 
+
+    if 'predict' not in dir(model):
+        raise Exception("ERROR: Model does not implement function 'predict'") 
+
+    if column not in dataset.columns:
+        raise Exception("ERROR: Dataset does not contain column: " + column) 
+
     rez = [] 
-    for record in dataset:
+    for index, record in dataset.iterrows():
         rez.append(explain_prediction(model, record, column, params))
     return rez
 
 ###################################################################################################################
 
 def explain_prediction(model, record, column, params):
-    return "No idea"
+    return record[column]
 
 
