@@ -6,22 +6,22 @@ dictionary = {}
 CURRENT_KEY = ""
 process_started = False
 antonyms_started = False
-end_string ="End of the Project Gutenberg EBook"
-
 
 ##################################################################
 def initialise_new_record(content):
     global CURRENT_KEY
     global antonyms_started
-    mykey, ref, pos = extract_ref_or_pos(content)
+    mykey, ref, pos = extract_key_ref_pos(content)
     CURRENT_KEY = mykey 
     antonyms_started = False
     dictionary[CURRENT_KEY] = {"SYN":[],"ANT":[],"REF":ref, "POS":pos}
+
 
 ##################################################################
 def finalise():
     print(dictionary)
     exit(1)
+
 
 ##################################################################
 def clean(x):
@@ -30,6 +30,7 @@ def clean(x):
     temp3 = re.sub('=','',temp2)
     return temp3
 
+
 ##################################################################
 def update_content(starter, content, stripped_line):
     if  starter == "SYN:":
@@ -37,9 +38,7 @@ def update_content(starter, content, stripped_line):
     elif  starter == "ANT:":
         update_antonyms(content)
     else:
-        if content.find(end_string) >=0:
-            finalise() 
-        elif antonyms_started :
+        if antonyms_started :
             update_antonyms(stripped_line)
         else:
             update_synonyms(stripped_line)
@@ -55,46 +54,53 @@ def update_antonyms(content):
     antonyms_started = True
     update_dictionary(content,"ANT")
 
+
 ##################################################################
 def update_dictionary(content,section):
     record = dictionary[CURRENT_KEY]
     newwds = content.split(",")
     newwds = list(map(str.strip,newwds))
+    if "" in newwds:
+        newwds.remove("")
     curr = record[section]
     curr.extend(newwds)
     record[section] = curr
     dictionary[CURRENT_KEY] = record
 
+
 ##################################################################
-def extract_ref_or_pos(content):
+def extract_key_ref_pos(content):
     pos = ""
-    ref = ""
-    res = re.findall(r"\\[a-zA-Z]+\.\\", content)
+    refs = []
+    res = re.findall(r"\\[a-zA-Z]+\.?\\", content)
     if len(res) != 0:
         pos = res[0]
-    temp = re.sub(r"\\[a-zA-Z]+\.\\", '', content).strip()
-    res = re.findall(r"\[.*\]", temp)
-    if len(res) != 0:
-        ref = res[0]
-        ref = re.sub(r"\[see", '', ref, flags=re.IGNORECASE).strip()
+    temp = re.sub(r"\\[a-zA-Z]+\.?\\", '', content).strip()
+    res = re.findall(r"\[[^\]]*\]", temp)
+    for r in res:
+        ref = re.sub(r"\[see", '', r, flags=re.IGNORECASE).strip()
         ref = re.sub(r"\]", '', ref).strip()
-    new_key = re.sub(r"\[.*\]", '', temp).strip()
+        refs.extend([ref])
+    keys = re.sub(r"\[.*\]", '', temp).strip()
+    new_key = keys.split(",")[0].strip()
     if len(new_key) == 0:
-        new_key = ref
-    return new_key, ref, pos
+        if len(refs) > 0:
+           new_key = refs[0]
+    return new_key, refs, pos
 
 
 ##################################################################
 def replace_refs(content):
     return re.sub(r"\[see (.*)\]", '\\1', content, flags=re.IGNORECASE).strip()
 
-##################################################################
 
+##################################################################
 with open(dict_file, "r") as f:
     for line in f:
         print("PROCESSING:", line)
         stripped_line = line.strip()
         stripped_line = clean(stripped_line)
+        stripped_line = re.sub("_", ' ', stripped_line)
         starter = stripped_line[0:4]
         content = stripped_line[5:]
         if starter == "KEY:":
@@ -106,3 +112,7 @@ with open(dict_file, "r") as f:
             update_content(starter, content, stripped_line)
     # NOW SAVE THE GENERATED DATA STRUCTURE
     finalise()
+
+
+
+
