@@ -22,11 +22,18 @@ Released and distributed via setuptools/PyPI/pip for Python 3.
 ### Resources & Dependencies
 
 For Part of Speech Tagging we use [spacy](https://spacy.io/usage/spacy-101)
-
 Note: After install you will need to get spaCy to download the English model.
 ```
 sudo python3 -m spacy download en
 ```
+
+For a dictionary of synonyms and antonyms we use wordnet from NLTK
+You will need to install wordnet post-package-install.
+```
+import nltk
+nltk.download('wordnet')
+```
+
 
 ## Usage
 
