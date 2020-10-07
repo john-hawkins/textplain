@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
  
-""" textplain.cli: provides entry point main()."""
+""" textplainer.cli: provides entry point main()."""
 import pandas as pd
 import sys
 import os

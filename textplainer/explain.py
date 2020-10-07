@@ -1,5 +1,5 @@
 """
-   This is the core textplain interface.
+   This is the core textplainer interface.
 
    The models passed into these functions are required to implement a single function called 'predict(x)'
    The function should take a pandas dataframe of features, and return an array with a single value per record.
@@ -7,14 +7,17 @@
 
 """
 
-
 ###################################################################################################################
+
 def explain_predictions(model, dataset, column, params):
-    return "No idea"
+    rez = [] 
+    for record in dataset:
+        rez.append(explain_prediction(model, record, column, params))
+    return rez
 
 ###################################################################################################################
+
 def explain_prediction(model, record, column, params):
     return "No idea"
-
 
 

@@ -1,8 +1,8 @@
-textplain
+textplainer
 ----------
 
 ```
-Status - In Development
+Status - Non-Functional: In Development
 ```
 
 This is an application to analyse the contribution of a text column to the performance
@@ -16,7 +16,7 @@ generally domain specific.
 
 ### Distribution
 
-Released and distributed via setuptools/PyPI/pip for Python 3.
+To be released and distributed via setuptools/PyPI/pip for Python 3.
 
 
 ### Resources & Dependencies
@@ -37,19 +37,24 @@ nltk.download('wordnet')
 
 ## Usage
 
+To use the application you will need a model that adheres to a [simple interface](textplainer/ModelInterface.py)
+It should go without saying that the model will need to utilise a text column. Note that the model in this case
+should wrap around any preprocessing required on the text. You will need a raw dataset containing text that you
+want to explain how it contributes to the model output.
+
+
 You can use this application multiple ways
 
 Use the runner without installing the application. 
-The following example will generate all features on the test data.
 
 ```
-./textplain-runner.py -columns=question,answer -pos -literacy -traits -rhetoric -profanity -emoticons -sentiment -comparison -topics=count data/test.csv > data/output.csv
+./textplainer-runner.py mymodel.pkl question data/test.csv > output.txt
 ```
 
 Alternatively, you can invoke the directory as a package:
  
 ```
-python -m textplain -columns=question,answer data/test.csv > data/output.csv
+python -m textplainer 
 ```
 
 Or simply install the package and use the command line application directly
@@ -65,13 +70,13 @@ python setup.py install
 (or via pip from PyPI):
 
 ```
-pip install textplain
+pip install textplainer
 ```
 
-Now, the ``textplain`` command is available::
+Now, the ``textplainer`` command is available::
 
 ```
-textplain mymodel.pkl question data/test.csv > output.txt
+textplainer mymodel.pkl question data/test.csv > output.txt
 ```
 
 
