@@ -10,6 +10,9 @@ version = re.search(
         open('textplainer/__init__.py').read(),
         re.M
     ).group(1)
+
+with open("README.md", "rb") as f:
+    long_descr = f.read().decode("utf-8")
  
 setup(
       name = "textplainer",

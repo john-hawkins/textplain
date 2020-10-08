@@ -1,5 +1,7 @@
 textplainer
 ----------
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![build](https://github.com/john-hawkins/textplainer/workflows/Build/badge.svg)
 
 ```
 Status - Non-Functional: In Development

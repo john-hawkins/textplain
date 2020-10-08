@@ -19,14 +19,12 @@ class PipelineBERT():
         """
             This function expects a list of text data in x and a numpy array of target integers in y 
         """
-         dataset = self.create_bert_training_data(x,y)
+        dataset = self.create_bert_training_data(x,y)
+        self.history = self.model.fit(train_dataset, epochs=10)
+        return self
 
-         self.history = self.model.fit(train_dataset, epochs=10)
-
-         return self
-
+    ###################################################################################################3
     def create_bert_training_data(x,y):
-
         train_df_bert = pd.DataFrame({
             'id':range(len(x)),
             'label':y,

@@ -1,8 +1,24 @@
 """
    This module provides dictionaries to look up synonyms and antonyms
 """
+# -*- coding: utf-8 -*-
 
-from nltk.corpus import wordnet
+from .process import eprint
+
+try:
+   from nltk.corpus import wordnet
+except:
+   eprint(" * WARNING: The complete synonym dictionary requires the wordnet corpus : nltk.download('wordnet') ")
+
+###################################################################################################################
+
+def get_synonyms_and_antonyms(word):
+    """
+        Entry function to obtain a list of synonyms and antonyms for a given word.
+        This function will rely on other libraries and datasets and merge them for 
+        a comprehensive reference.
+    """
+    return ["test"], ["test"]
 
 ###################################################################################################################
 
