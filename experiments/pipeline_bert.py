@@ -6,6 +6,8 @@ import pandas as pd
 # Pipeline Bert
 #
 # Train a text classifer using BERT
+#
+# -- NON FUNCTIONAL
 
 class PipelineBERT():
 
@@ -39,11 +41,18 @@ class PipelineBERT():
         if isinstance(x, str):
             return self.model.predict( self.encoder.encode(x) )
         else:
-            return self.model.predict( encodeall(x) )
+            return self.model.predict( encode_all(x) )
 
 
     ###################################################################################################3
-    def save(path):
+    def encode_all(self, x):
+        """
+            This function will prepare multiple records for the predict function
+        """
+        return x
+
+    ###################################################################################################3
+    def save(self, path):
          self.model.save(path + 'tf_model.h5') 
          self.encoder.save_to_file(path + 'encoder.dat')
 

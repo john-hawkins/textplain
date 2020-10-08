@@ -68,7 +68,7 @@ class PipelineTwo():
             return self.model.predict( encodeall(x) )
 
     ###################################################################################################3
-    def encode_all(x):
+    def encode_all(self, x):
         """
            This function will take an array of text and prepare it so that they can be all scored by the
            model in parrallel. This means encoding them and then padding them to have the same length.
@@ -84,7 +84,7 @@ class PipelineTwo():
 
 
     ###################################################################################################3
-    def save(path):
+    def save(self, path):
          self.model.save(path + 'tf_model.h5') 
          self.encoder.save_to_file(path + 'encoder.dat')
 
