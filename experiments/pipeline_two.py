@@ -1,11 +1,10 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-
 import tensorflow_datasets as tfds
 import tensorflow as tf
 import pandas as pd
 
 ##############################################################################################
-# PipelineOne
+# PipelinTwo
 #
 # Second ML Pipeline. 
 # TensorFlow Bi-Direction LSTM
@@ -22,50 +21,49 @@ class PipelineTwo():
         """
             This function expects a list of text data in x and a numpy array of target integers in y 
         """
-         gen = (n for n in x)
-         self.encoder = tfds.features.text.SubwordTextEncoder.build_from_corpus(gen, target_vocab_size=10000)
+        gen = (n for n in x)
+        self.encoder = tfds.features.text.SubwordTextEncoder.build_from_corpus(gen, target_vocab_size=10000)
 
-         tempy = pd.DataFrame({'text':x})
-         dataset = tf.data.Dataset.from_tensor_slices((tempy.values, y))
+        tempy = pd.DataFrame({'text':x})
+        dataset = tf.data.Dataset.from_tensor_slices((tempy.values, y))
 
-         def encode(text_tensor, label):
+        def encode(text_tensor, label):
              encoded_text = self.encoder.encode(text_tensor.numpy())
              return encoded_text, label
 
-         def encode_map_fn(feats, label):
+        def encode_map_fn(feats, label):
              text = feats[0]
-             encoded_text, label = tf.py_function(encode,inp=[text, label],Tout=(tf.int64, tf.int64)
-             # tf.data.Datasets work best if all components have a shape set
-             encoded_text.set_shape([None])
+             encoded_text, label = tf.py_function(encode,inp=[text, label],Tout=(tf.int64, tf.int64))
+             encoded_text.set_shape([None]) # tf.data.Datasets work better with a shape set
              label.set_shape([])
              return encoded_text, label
 
-         encoded_dataset = dataset.map(encode_map_fn)
+        encoded_dataset = dataset.map(encode_map_fn)
 
-         train_dataset = encoded_dataset.shuffle(self.BUFFER_SIZE)
-         output_shapes = tf.compat.v1.data.get_output_shapes(train_dataset)
+        train_dataset = encoded_dataset.shuffle(self.BUFFER_SIZE)
+        output_shapes = tf.compat.v1.data.get_output_shapes(train_dataset)
 
-         self.model = tf.keras.Sequential([
+        self.model = tf.keras.Sequential([
              tf.keras.layers.Embedding(encoder.vocab_size, 64),
              tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64)),
              tf.keras.layers.Dense(64, activation='relu'),
              tf.keras.layers.Dense(1, activation='sigmoid')
-         ])
+        ])
 
-         self.model.compile(loss='binary_crossentropy',
+        self.model.compile(loss='binary_crossentropy',
               optimizer=tf.keras.optimizers.Adam(1e-4),
               metrics=['accuracy'])
 
-         self.history = self.model.fit(train_dataset, epochs=10)
+        self.history = self.model.fit(train_dataset, epochs=10)
 
-         return self
+        return self
 
     ###################################################################################################3
     def predict(self, x):
         if isinstance(x, str):
             return self.model.predict( self.encoder.encode(x) )
         else:
-            return self.model.predict( encodeall(x) )
+            return self.model.predict( self.encode_all(x) )
 
     ###################################################################################################3
     def encode_all(self, x):
@@ -82,11 +80,8 @@ class PipelineTwo():
         enc2 = list( map(custom_pad,enc1) )
         return enc2
 
-
     ###################################################################################################3
     def save(self, path):
          self.model.save(path + 'tf_model.h5') 
          self.encoder.save_to_file(path + 'encoder.dat')
-
-
 
