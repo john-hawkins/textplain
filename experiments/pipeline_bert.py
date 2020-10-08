@@ -41,7 +41,7 @@ class PipelineBERT():
         if isinstance(x, str):
             return self.model.predict( self.encoder.encode(x) )
         else:
-            return self.model.predict( encode_all(x) )
+            return self.model.predict( self.encode_all(x) )
 
 
     ###################################################################################################3
