@@ -3,6 +3,7 @@
 """
 # -*- coding: utf-8 -*-
 
+import nltk
 from .process import eprint
 
 try:
