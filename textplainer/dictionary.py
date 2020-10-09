@@ -6,6 +6,7 @@
 from .process import eprint
 
 try:
+   nltk.data.find('wordnet')
    from nltk.corpus import wordnet
    NLTKWORDNET = True
 except:
