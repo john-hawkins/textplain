@@ -8,11 +8,17 @@ from time import time
 import pandas as pd
 
 ##############################################################################################
-# PipelineOne
+# Pipeline_Sklearn_NGram_Tfidf_SGD_Classifier.
 #
-# Our first ML Pipeline. We use the same overall class structure in all examples
+# A complete ML Pipeline for classifying text data.
+#
+# The fit function will train a model by applying the following stages
+#  - Word Count Vectorization
+#  - TFIDF Transformation
+#  - SGD Linear Classifier
+#
 
-class PipelineOne():
+class Pipeline_Sklearn_NGram_Tfidf_SGD_Classifier():
 
     pipeline = Pipeline([
         ('vect', CountVectorizer()),

@@ -1,15 +1,14 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
 import tensorflow_datasets as tfds
 import tensorflow as tf
 import pandas as pd
 
 ##############################################################################################
-# PipelinTwo
+# Pipeline_TensorFlow_Subword_Bidirec_LSTM_Classfier
 #
-# Second ML Pipeline. 
-# TensorFlow Bi-Direction LSTM
+# TensorFlow Bi-Direction LSTM Model for Classifying Text data
+# This pipeline 
 
-class PipelineTwo():
+class Pipeline_TensorFlow_Subword_Bidirec_LSTM_Classfier():
 
     BUFFER_SIZE = 10000
     BATCH_SIZE = 64
@@ -42,6 +41,7 @@ class PipelineTwo():
 
         train_dataset = encoded_dataset.shuffle(self.BUFFER_SIZE)
         output_shapes = tf.compat.v1.data.get_output_shapes(train_dataset)
+        train_dataset = train_dataset.padded_batch(self.BATCH_SIZE, output_shapes)
 
         self.model = tf.keras.Sequential([
              tf.keras.layers.Embedding(self.encoder.vocab_size, 64),
@@ -60,10 +60,13 @@ class PipelineTwo():
 
     ###################################################################################################3
     def predict(self, x):
+        encoded = []
         if isinstance(x, str):
-            return self.model.predict( self.encoder.encode(x) )
+            encoded.append(self.encoder.encode(x))
+            return self.model.predict(encoded)
         else:
-            return self.model.predict( self.encode_all(x) )
+            return self.model.predict(self.encode_all(x))
+
 
     ###################################################################################################3
     def encode_all(self, x):
