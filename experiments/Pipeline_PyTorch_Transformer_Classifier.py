@@ -52,15 +52,15 @@ class Pipeline_PyTorch_Transformer_Classifier():
             This function expects a pandas dataframe and two strings that determine the names of
             of the text features column and the target column.
         """
-        train_iter, valid_iter = prepare_data_iterators(df, text, label)
+        train_iter, valid_iter = self.prepare_data_iterators(df, text, label)
         self.model = BERT()
         self.optimizer = optim.Adam(self.model.parameters(), lr=2e-5)
-        self.train(rain_iter, valid_iter)
+        self.train(train_iter, valid_iter)
         return self
 
 
     ###################################################################################################
-    def prepare_data_iterators(df, text, label):
+    def prepare_data_iterators(self, df, text, label):
         """
             This function will take a Pandas dataframe and the names of the text and label columns
             and it will generate PyTorch Dataset Iterators to be used for training the model.
@@ -148,7 +148,7 @@ class Pipeline_PyTorch_Transformer_Classifier():
     def load_checkpoint(self, load_path, model):
         if load_path==None:
             return
-        state_dict = torch.load(load_path, map_location=device)
+        state_dict = torch.load(load_path, map_location=self.device)
         print(f'Model loaded from <== {load_path}')
         model.load_state_dict(state_dict['model_state_dict'])
         return state_dict['valid_loss']
@@ -167,7 +167,7 @@ class Pipeline_PyTorch_Transformer_Classifier():
     def load_metrics(self, load_path):
         if load_path==None:
             return
-        state_dict = torch.load(load_path, map_location=device)
+        state_dict = torch.load(load_path, map_location=self.device)
         print(f'Model loaded from <== {load_path}')
         return state_dict['train_loss_list'], state_dict['valid_loss_list'], state_dict['global_steps_list']
 
