@@ -2,19 +2,34 @@ import pandas as pd
 import re
 
 dict_file = "temp.txt"
+#dict_file = "data2.txt"
 dictionary = {}
 CURRENT_KEY = ""
 process_started = False
 antonyms_started = False
+
+# Some entries contain multiple words that should have independent entries
+# For the moment we will use the first key
+key_split_pattern = " or "
+
+# NOTES
+# There are multiple keys that contain phrasal verbs, or additonal grammatical
+# notes in the key field. We are ignoring them for the moment which will render
+# the corresponding entry inaccessible by word look up. There are 20 odd entries
+# like this. E.g carry on, fawn upon, pluck up
 
 ##################################################################
 def initialise_new_record(content):
     global CURRENT_KEY
     global antonyms_started
     mykey, ref, pos = extract_key_ref_pos(content)
-    CURRENT_KEY = mykey 
+    if len(mykey.split(key_split_pattern))>1:
+        mykey = mykey.split(key_split_pattern)[0]
+    if pos == "":
+        pos = 'x'
+    CURRENT_KEY = mykey + "_" + pos 
     antonyms_started = False
-    dictionary[CURRENT_KEY] = {"SYN":[],"ANT":[],"REF":ref, "POS":pos}
+    dictionary[CURRENT_KEY] = {"SYN":[], "ANT":[], "REF":ref, "POS":pos}
 
 
 ##################################################################
@@ -75,12 +90,14 @@ def extract_key_ref_pos(content):
     res = re.findall(r"\\[a-zA-Z]+\.?\\", content)
     if len(res) != 0:
         pos = res[0]
+        pos = pos[1]
     temp = re.sub(r"\\[a-zA-Z]+\.?\\", '', content).strip()
     res = re.findall(r"\[[^\]]*\]", temp)
     for r in res:
         ref = re.sub(r"\[see", '', r, flags=re.IGNORECASE).strip()
         ref = re.sub(r"\]", '', ref).strip()
-        refs.extend([ref])
+        refl = ref.split(" and ")
+        refs.extend(refl)
     keys = re.sub(r"\[.*\]", '', temp).strip()
     new_key = keys.split(",")[0].strip()
     if len(new_key) == 0:
@@ -97,7 +114,7 @@ def replace_refs(content):
 ##################################################################
 with open(dict_file, "r") as f:
     for line in f:
-        print("PROCESSING:", line)
+        #print("PROCESSING:", line)
         stripped_line = line.strip()
         stripped_line = clean(stripped_line)
         stripped_line = re.sub("_", ' ', stripped_line)
