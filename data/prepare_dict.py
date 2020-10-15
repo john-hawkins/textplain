@@ -1,12 +1,14 @@
 import pandas as pd
+import pickle
 import re
 
-dict_file = "temp.txt"
-#dict_file = "data2.txt"
+dict_file = "data2.txt"
 dictionary = {}
 CURRENT_KEY = ""
 process_started = False
 antonyms_started = False
+
+output_file = "../textplainer/data/fallows.dat"
 
 # Some entries contain multiple words that should have independent entries
 # For the moment we will use the first key
@@ -34,7 +36,8 @@ def initialise_new_record(content):
 
 ##################################################################
 def finalise():
-    print(dictionary)
+    with open(output_file, 'wb') as f:
+        pickle.dump(dictionary, f)
     exit(1)
 
 

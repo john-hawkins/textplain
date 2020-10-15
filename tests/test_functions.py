@@ -4,6 +4,8 @@ from textplainer.explain import explain_prediction
 from textplainer.explain import explain_predictions
 from textplainer.ModelInterface import ModelInterface
 from textplainer.dictionary import get_synonyms_and_antonyms
+from textplainer.dictionary import get_fallows_synonyms_and_antonyms
+
 
 def test_result_length():
     null_model = ModelInterface("NULL")
@@ -16,6 +18,14 @@ def test_dictionary():
     assert str(type(syns)) == "<class 'list'>", "Synonyms should be returned as a list"
     assert str(type(ants)) == "<class 'list'>", "Antonyms should be returned as a list"
 
+
+def test_fallows_dictionary():
+    word = "test"
+    syns, ants = get_fallows_synonyms_and_antonyms(word)
+    assert str(type(syns)) == "<class 'list'>", "Synonyms should be returned as a list"
+    assert str(type(ants)) == "<class 'list'>", "Antonyms should be returned as a list"
+    assert len(syns) == 10, "Test string should have 10 synonyms"
+    assert len(ants) == 3, "Test string should have 3 antonyms"
 
 def test_result_attributes():
     null_model = ModelInterface("NULL")
