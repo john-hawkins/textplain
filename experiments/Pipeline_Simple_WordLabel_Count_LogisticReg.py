@@ -28,15 +28,15 @@ class Pipeline_Simple_WordLabel_Count_LogisticReg():
         """
         self.text_col_name = text
         self.label_col_name = label 
-        self.freqs = build_word_dictionary(df, text, label)
+        self.freqs = self.build_word_dictionary(df, text, label)
 
         X = np.zeros((len(df), 3))
         for i in range(len(df)):
-            X[i, :]= extract_features(df[text][i], self.freqs)
+            X[i, :]= self.extract_features(df[text][i], self.freqs)
 
         Y = df[label] 
 
-        J, self.theta = gradientDescent(X, Y, np.zeros((3, 1)), 1e-9, 1500)
+        J, self.theta = self.gradientDescent(X, Y, np.zeros((3, 1)), 1e-9, 1500)
         print(f"The cost after training is {J:.8f}.")
         print(f"The resulting vector of weights is {[round(t, 8) for t in np.squeeze(self.theta)]}")
 
@@ -55,8 +55,21 @@ class Pipeline_Simple_WordLabel_Count_LogisticReg():
 
     ###################################################################################################
 
+    def build_word_dictionary(self, df, text, label):
+        freqs = {}
+        for index, row in df.iterrows():
+            word_l = self.process_text(row[text])
+            lab = row[label]
+            for word in word_l:
+                key = (word, lab)
+                val = freqs.get(key,0)
+                freqs[key] = val + 1
+        return freqs
+
+    ###################################################################################################
+
     def sigmoid(self, z): 
-         '''
+        '''
         Input:
             z: is the input (can be a scalar or an array)
         Output:
@@ -148,6 +161,9 @@ class Pipeline_Simple_WordLabel_Count_LogisticReg():
     
     ###################################################################################################
     def process_text(self, text):
+        #tweet2 = re.sub(r'https?:\/\/.*[\r\n]*', '', tweet2)
+        #!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+        stop_words = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', "you're", "you've", "you'll", "you'd", 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', "she's", 'her', 'hers', 'herself', 'it', "it's", 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', "that'll", 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', "don't", 'should', "should've", 'now', 'd', 'll', 'm', 'o', 're', 've', 'y', 'ain', 'aren', "aren't", 'couldn', "couldn't", 'didn', "didn't", 'doesn', "doesn't", 'hadn', "hadn't", 'hasn', "hasn't", 'haven', "haven't", 'isn', "isn't", 'ma', 'mightn', "mightn't", 'mustn', "mustn't", 'needn', "needn't", 'shan', "shan't", 'shouldn', "shouldn't", 'wasn', "wasn't", 'weren', "weren't", 'won', "won't", 'wouldn', "wouldn't"]
         return text.split()
     
     ###################################################################################################
