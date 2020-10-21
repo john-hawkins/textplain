@@ -1,6 +1,7 @@
 import tensorflow_datasets as tfds
 import tensorflow as tf
 import pandas as pd
+import numpy as np
 
 ##############################################################################################
 # Pipeline_TensorFlow_Subword_Bidirec_LSTM_Classfier
@@ -16,7 +17,22 @@ class Pipeline_TensorFlow_Subword_Bidirec_LSTM_Classfier():
     def __init__(self):
         pass
 
-    def fit(self, x, y):
+
+    ###################################################################################################
+
+    def fit(self, df, text, label):
+        """
+            This function expects a pandas dataframe and two strings that determine the names of
+            of the text features column and the target column. From this, we will build a model.
+        """
+        self.text_col_name = text
+        self.label_col_name = label
+        y = np.array(df[label])
+        x = df[text].tolist()
+        return self.fit_from_vectors(x, y)
+
+
+    def fit_from_vectors(self, x, y):
         """
             This function expects a list of text data in x and a numpy array of target integers in y 
         """
@@ -58,8 +74,18 @@ class Pipeline_TensorFlow_Subword_Bidirec_LSTM_Classfier():
 
         return self
 
+    ###################################################################################################
+
+    def predict(self, df):
+        """
+            Given a DataFrame that has the required field from training, make predictions for
+            each row.
+        """
+        x = df[self.text_col_name].tolist()
+        return self.predict_from_vectors(x)
+
     ###################################################################################################3
-    def predict(self, x):
+    def predict_from_vectors(self, x):
         encoded = []
         if isinstance(x, str):
             encoded.append(self.encoder.encode(x))

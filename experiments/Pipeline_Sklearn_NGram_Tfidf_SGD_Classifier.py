@@ -6,6 +6,7 @@ from sklearn.pipeline import Pipeline
 from pprint import pprint
 from time import time 
 import pandas as pd
+import numpy as np
 
 ##############################################################################################
 # Pipeline_Sklearn_NGram_Tfidf_SGD_Classifier.
@@ -34,10 +35,28 @@ class Pipeline_Sklearn_NGram_Tfidf_SGD_Classifier():
         'clf__penalty': ('l2', 'elasticnet'),
     }
 
-    def __init__(self):
-        pass
+    ###################################################################################################
 
-    def fit(self, x, y):
+    def __init__(self, results_dir):
+        self.results_dir = results_dir
+
+    ###################################################################################################
+
+    def fit(self, df, text, label):
+        """
+            This function expects a pandas dataframe and two strings that determine the names of
+            of the text features column and the target column. From this, we will build a model.
+        """
+        self.text_col_name = text
+        self.label_col_name = label 
+        y = np.array(df[label])
+        x = df[text].tolist()
+        return self.fit_from_vectors(x, y)
+
+
+    ###################################################################################################
+
+    def fit_from_vectors(self, x, y):
         """
             This function expects a list of text data in x and a numpy array of target integers in y 
         """
@@ -61,9 +80,25 @@ class Pipeline_Sklearn_NGram_Tfidf_SGD_Classifier():
 
         self.model = grid_search.best_estimator_
 
-        return self.model
+        return self
 
-    def predict(self, x):
+    ###################################################################################################
+
+    def predict(self, df):
+        """
+            Given a DataFrame that has the required field from training, make predictions for
+            each row.
+        """
+        x = df[self.text_col_name].tolist()
+        return self.predict_from_vectors(x)
+
+    ###################################################################################################
+
+    def predict_from_vectors(self, x):
         return self.model.predict_proba(x)
+
+
+    ###################################################################################################
+
 
 
