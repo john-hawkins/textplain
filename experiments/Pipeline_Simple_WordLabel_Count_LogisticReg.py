@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import math
 
 ##############################################################################################
 # Pipeline_Simple_WordLabel_Count_LogisticReg 
@@ -31,10 +32,13 @@ class Pipeline_Simple_WordLabel_Count_LogisticReg():
         self.freqs = self.build_word_dictionary(df, text, label)
 
         X = np.zeros((len(df), 3))
-        for i in range(len(df)):
-            X[i, :]= self.extract_features(df[text][i], self.freqs)
+        i = 0
+        for index, row in df.iterrows():
+            X[i, :]= self.extract_features(row[text], self.freqs)
+            i = i + 1
 
-        Y = df[label] 
+        Y = df[label].to_numpy()
+        Y.shape = (len(Y),1)
 
         J, self.theta = self.gradientDescent(X, Y, np.zeros((3, 1)), 1e-9, 1500)
         print(f"The cost after training is {J:.8f}.")
@@ -142,18 +146,14 @@ class Pipeline_Simple_WordLabel_Count_LogisticReg():
         '''
         # process_text tokenizes, stems, and removes stopwords
         word_l = self.process_text(text)
-        
         # 3 elements in the form of a 1 x 3 vector
         x = np.zeros((1, 3)) 
-        
         #bias term is set to 1
         x[0,0] = 1 
-        
         # loop through each word in the list of words
         for word in word_l:
             # increment the word count for the positive label 1
             x[0,1] += freqs.get( (word, 1.0), 0)
-            
             # increment the word count for the negative label 0
             x[0,2] += freqs.get( (word, 0.0), 0)
             

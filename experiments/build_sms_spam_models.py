@@ -22,9 +22,9 @@ train = df[~test_set]
 y = np.array(train['label'])
 x = train['text'].tolist()
 
+
 pipe0 = p0.Pipeline_Simple_WordLabel_Count_LogisticReg("results")
 model0 = pipe0.fit(train, "text", "label")
-
 
 
 pipe1 = p1.Pipeline_Sklearn_NGram_Tfidf_SGD_Classifier("results")
