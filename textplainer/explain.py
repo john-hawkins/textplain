@@ -22,12 +22,22 @@ def explain_predictions(model, dataset, column, params):
 
     rez = [] 
     for index, record in dataset.iterrows():
-        rez.append(explain_prediction(model, record, column, params))
+        # NOTE: We can't use the record directly because pandas produces a Series object
+        # in this form of iteration. We need to use the trick below to force it to produce
+        # a single record DataFrame
+        rez.append(explain_prediction(model, dataset.loc[index:index], column, params))
+
     return rez
 
 ###################################################################################################################
 
 def explain_prediction(model, record, column, params):
-    return record[column]
+    baseline_score = model.predict(record)[0]
+    null_record = record.copy()
+    null_record[column] = ""
+    null_score = model.predict(null_record)[0]
+    impact = baseline_score - null_score 
+    #print("impact: ", impact, " type:", type(impact))
+    return impact, record[column].values[0]
 
 

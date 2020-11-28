@@ -5,13 +5,22 @@ from textplainer.explain import explain_predictions
 from textplainer.ModelInterface import ModelInterface
 from textplainer.dictionary import get_synonyms_and_antonyms
 from textplainer.dictionary import get_fallows_synonyms_and_antonyms
-
+from .TestModels import SingleWordModel
 
 def test_result_length():
     null_model = ModelInterface("NULL")
     df = pd.DataFrame({"id":[1,2,3],"text":["the cat","the hat","the mat"]})
     result = explain_predictions(null_model, df, "text", None)
     assert len(result) == len(df), "Explain function returns results for all records"
+
+def test_single_word_model():
+    jellybean_model = SingleWordModel("JellyBeanModel", "TEXT", "jellybean")
+    df = pd.DataFrame({"ID":[1,2],"TEXT":["bob eats jellybeans","jane likes to swim"]})
+    result = explain_predictions(jellybean_model, df, "TEXT", None)
+    assert len(result) == len(df), "Explain function returns results for all records"
+    assert result[0][0] == 1,         "First record contains discriminative word that perfectly explains output."
+    assert result[1][0] == 0,         "Second record cannot be determined"
+
 
 def test_dictionary():
     syns, ants = get_synonyms_and_antonyms("test")
@@ -32,7 +41,11 @@ def test_result_attributes():
     df = pd.DataFrame({"id":[1,2],"text":["the cat","the hat"]})
     result = explain_predictions(null_model, df, "text", None)
     assert str(type(result)) == "<class 'list'>", "Explain function returns a list"
-    assert str(type(result[0])) == "<class 'str'>", "Returned list contains strings"
+    assert str(type(result[0])) == "<class 'tuple'>", "Returned list contains tuples"
+    #assert str(type(result[0][0])) == "<class 'float'>", "First element is a number"
+    assert isinstance(result[0][0], float) == True, "First element is a number"
+    assert str(type(result[0][1])) == "<class 'str'>", "Second element is a string"
+
 
 def test_exceptions():
     null_model = ModelInterface("NULL")
