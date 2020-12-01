@@ -6,6 +6,8 @@
    This value should be numeric and could represent a probability or scalar value being forecast.
 
 """
+import re
+import pandas as pd
 
 ###################################################################################################################
 
@@ -37,7 +39,42 @@ def explain_prediction(model, record, column, params):
     null_record[column] = ""
     null_score = model.predict(null_record)[0]
     impact = baseline_score - null_score 
-    #print("impact: ", impact, " type:", type(impact))
-    return impact, record[column].values[0]
+    if impact == 0:
+        # We have a text field that does not change the prediction from an empty string
+        # Do not waste time analysing this any further
+        return impact, record[column].values[0]
+    else:
+        # Deeper analysis
+        return impact, deeper_explanation(model, record, column, baseline_score, null_score, params)
+
+
+###################################################################################################################
+def deeper_explanation(model, record, column, baseline, nullscore, params):
+    textvalue = record[column].values[0]
+    impact = baseline - nullscore
+    sentences = re.split( "[.?!\n]", textvalue )
+    sentences = [x.strip() for x in sentences]
+    if "" in sentences:
+        sentences.remove("")
+    res = [] 
+    [res.append(x) for x in sentences if x not in res] 
+    # Generate a list of all variations removing each unique sentence
+    # Tried this. But it creates the problem of reconstruction the punctuation that joined sentences
+    # [[x for i,x in enumerate(test) if i!=j] for j in range(len(test))] 
+
+    # This version will leave all original punctuation in place
+    test_strings = [ textvalue.replace(x,"") for i,x in enumerate(sentences)]
+
+    df_repeated = pd.concat([record]*len(test_strings), ignore_index=True)
+    df_repeated[column] = test_strings
+
+    sentence_scores = model.predict(df_repeated)
+    # Calculate difference relative to the baseline
+    impacts = baseline - sentence_scores
+    result = textvalue
+    for i,x in enumerate(sentences):
+        result = result.replace(x, x + "{{" + str(impacts[i]) + "}}")
+
+    return result
 
 

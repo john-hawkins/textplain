@@ -21,6 +21,20 @@ def test_single_word_model():
     assert result[0][0] == 1,         "First record contains discriminative word that perfectly explains output."
     assert result[1][0] == 0,         "Second record cannot be determined"
 
+def test_multiple_sentences_model():
+    jellybean_model = SingleWordModel("JellyBeanModel", "TEXT", "jellybean")
+    df = pd.DataFrame({"ID":[1,2],"TEXT":["I eat a jellybean. Bob eats a fig.","Jane likes to swim"]})
+    result = explain_predictions(jellybean_model, df, "TEXT", None)
+    assert len(result) == len(df), "Explain function returns results for all records"
+    assert result[0][0] == 1,         "First record contains discriminative word that perfectly explains output."
+    assert result[1][0] == 0,         "Second record cannot be determined"
+    record_one = result[0]
+    print("record one:", record_one)
+    record_one_text = result[0][1]
+    print("record one text:", record_one_text)
+    assert record_one_text.__contains__("{{1}}") ,         "One sentence with full contribution"
+    assert record_one_text.__contains__("{{0}}") ,         "One sentence with zero contribution"
+
 
 def test_dictionary():
     syns, ants = get_synonyms_and_antonyms("test")

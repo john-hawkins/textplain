@@ -40,7 +40,7 @@ class Pipeline_Simple_WordLabel_Count_LogisticReg():
         Y = df[label].to_numpy()
         Y.shape = (len(Y),1)
 
-        J, self.theta = self.gradientDescent(X, Y, np.zeros((3, 1)), 1e-9, 1500)
+        J, self.theta = self.gradientDescent(X, Y, np.zeros((3, 1)), 1e-7, 1005000)
         print(f"The cost after training is {J:.8f}.")
         print(f"The resulting vector of weights is {[round(t, 8) for t in np.squeeze(self.theta)]}")
 
@@ -110,7 +110,8 @@ class Pipeline_Simple_WordLabel_Count_LogisticReg():
         Hint: you might want to print the cost to make sure that it is going down.
         '''
         m = None
-        
+        lowest_cost = np.inf
+        best_theta = theta        
         for i in range(0, num_iters):
             
             z = np.dot(x, theta)
@@ -128,7 +129,13 @@ class Pipeline_Simple_WordLabel_Count_LogisticReg():
     
             def theta_delta(xs, ys, preds):
                 return np.dot( np.transpose(xs), (preds-ys) ) / len(ys)
-            
+            if J < lowest_cost:
+                lowest_cost = J
+                best_theta = theta
+            elif lowest_cost < (J*1.05):
+                print(f"Applying early stopping after {i} rounds") 
+                return float(lowest_cost), best_theta
+
             theta = theta - alpha*theta_delta(x, y, h)
             
         J = float(J)
