@@ -28,8 +28,8 @@ class Pipeline_Simple_NaiveBayes():
         self.text_col_name = text
         self.label_col_name = label 
         self.freqs = self.build_word_dictionary(df, text, label)
-
-        self.logprior, self.loglikelihood = train_naive_bayes(self.freqs, train_y)
+        train_y = df[self.label_col_name]
+        self.logprior, self.loglikelihood = self.train_naive_bayes(self.freqs, train_y)
 
         return self
 
@@ -43,6 +43,7 @@ class Pipeline_Simple_NaiveBayes():
         """
         x = df[self.text_col_name].tolist()
         return self.predict_from_vectors(x)
+
     ###################################################################################################
 
     def predict_from_vectors(self, x):

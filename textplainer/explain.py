@@ -59,10 +59,12 @@ def deeper_explanation(model, record, column, baseline, nullscore, params):
     res = [] 
     [res.append(x) for x in sentences if x not in res] 
     # Generate a list of all variations removing each unique sentence
-    # Tried this. But it creates the problem of reconstruction the punctuation that joined sentences
-    # [[x for i,x in enumerate(test) if i!=j] for j in range(len(test))] 
+    # Tried this. 
+    # test_strings = [[x for i,x in enumerate(test) if i!=j] for j in range(len(test))] 
+    # But it creates a problem of how to reconstruct the sequence of punctuation that joined sentences
 
-    # This version will leave all original punctuation in place
+    # This version will leave all original punctuation in place, some of the remaining punctuation will
+    # look messy. But we can be sure it is only testing the effect of the specific sentence removal.
     test_strings = [ textvalue.replace(x,"") for i,x in enumerate(sentences)]
 
     df_repeated = pd.concat([record]*len(test_strings), ignore_index=True)
