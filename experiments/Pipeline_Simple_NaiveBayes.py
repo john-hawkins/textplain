@@ -142,7 +142,7 @@ class Pipeline_Simple_NaiveBayes():
             p: the sum of all the logliklihoods of each word in the text (if found in the dictionary) + logprior (a number)
     
         '''
-        word_l = process_text(text)
+        word_l = self.process_text(text)
     
         # initialize probability to zero
         p = 0
