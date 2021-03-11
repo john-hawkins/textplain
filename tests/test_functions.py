@@ -6,42 +6,65 @@ from textplainer.ModelInterface import ModelInterface
 from textplainer.dictionary import get_synonyms_and_antonyms
 from textplainer.dictionary import get_fallows_synonyms_and_antonyms
 from .TestModels import SingleWordModel
+from .TestModels import MultiWordModel
 
+########################################################################################
 def test_result_length():
     null_model = ModelInterface("NULL")
     df = pd.DataFrame({"id":[1,2,3],"text":["the cat","the hat","the mat"]})
     result = explain_predictions(null_model, df, "text", None)
     assert len(result) == len(df), "Explain function returns results for all records"
 
+########################################################################################
 def test_single_word_model():
     jellybean_model = SingleWordModel("JellyBeanModel", "TEXT", "jellybean")
     df = pd.DataFrame({"ID":[1,2],"TEXT":["bob eats jellybeans","jane likes to swim"]})
     result = explain_predictions(jellybean_model, df, "TEXT", None)
     assert len(result) == len(df), "Explain function returns results for all records"
-    assert result[0][0] == 1,         "First record contains discriminative word that perfectly explains output."
-    assert result[1][0] == 0,         "Second record cannot be determined"
+    assert result[0][0] == 1, "First record contains discriminative word that perfectly explains output."
+    assert result[1][0] == 0, "Second record cannot be determined"
 
+########################################################################################
+def test_multi_word_model():
+    beans_model = MultiWordModel("BeansModel", "TEXT", ["flajeolet","cannellini"])
+    df = pd.DataFrame({
+        "ID":[1,2],
+         "TEXT":["bob only eats cannellini beans","jane likes cannellini and flajeolet beans"]
+    })
+    result = explain_predictions(beans_model, df, "TEXT", None)
+    assert len(result) == len(df), "Explain function returns results for all records"
+    record_one = result[0]
+    record_one_text = result[0][1]
+    assert record_one_text.__contains__("cannellini{{0.5}}"), "cannellini contribution"
+    record_two = result[1]
+    record_two_text = result[1][1]
+    assert record_two_text.__contains__("{{0.5}}"), "Words with partial contribution."
+    assert record_two_text.__contains__("cannellini{{0.5}}"), "cannellini has half contribution"
+
+
+########################################################################################
 def test_multiple_sentences_model():
     jellybean_model = SingleWordModel("JellyBeanModel", "TEXT", "jellybean")
     df = pd.DataFrame({"ID":[1,2],"TEXT":["I eat a jellybean. Bob eats a fig.","Jane likes to swim"]})
     result = explain_predictions(jellybean_model, df, "TEXT", None)
     assert len(result) == len(df), "Explain function returns results for all records"
-    assert result[0][0] == 1,         "First record contains discriminative word that perfectly explains output."
-    assert result[1][0] == 0,         "Second record cannot be determined"
+    assert result[0][0] == 1, "First record contains word that perfectly explains output."
+    assert result[1][0] == 0, "Second record cannot be determined"
     record_one = result[0]
     print("record one:", record_one)
     record_one_text = result[0][1]
     print("record one text:", record_one_text)
-    assert record_one_text.__contains__("{{1}}") ,         "One sentence with full contribution"
-    assert record_one_text.__contains__("{{0}}") ,         "One sentence with zero contribution"
+    assert record_one_text.__contains__("{{1.0}}"), "One sentence with full contribution"
+    assert record_one_text.__contains__("jellybean{{1.0}}"), "jellybean has full contribution"
 
-
+########################################################################################
 def test_dictionary():
     syns, ants = get_synonyms_and_antonyms("test")
     assert str(type(syns)) == "<class 'list'>", "Synonyms should be returned as a list"
     assert str(type(ants)) == "<class 'list'>", "Antonyms should be returned as a list"
 
 
+########################################################################################
 def test_fallows_dictionary():
     word = "test"
     syns, ants = get_fallows_synonyms_and_antonyms(word)
@@ -50,6 +73,7 @@ def test_fallows_dictionary():
     assert len(syns) == 10, "Test string should have 10 synonyms"
     assert len(ants) == 3, "Test string should have 3 antonyms"
 
+########################################################################################
 def test_result_attributes():
     null_model = ModelInterface("NULL")
     df = pd.DataFrame({"id":[1,2],"text":["the cat","the hat"]})
@@ -61,6 +85,7 @@ def test_result_attributes():
     assert str(type(result[0][1])) == "<class 'str'>", "Second element is a string"
 
 
+########################################################################################
 def test_exceptions():
     null_model = ModelInterface("NULL")
     df = pd.DataFrame({"id":[1,2],"text":["the cat","the hat"]})
@@ -70,8 +95,6 @@ def test_exceptions():
     except:
         thrown = True
     assert thrown == True, "Exception should be thrown when column name is not a string"
-
-
     thrown = False
     try:
         result = explain_predictions(null_model, df, "textnot", None)

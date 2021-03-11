@@ -33,9 +33,17 @@ def main():
 #############################################################
 def get_cmd_line_params(argv):
     """ 
-       Parse out the option from an array of command line arguments 
-       and return them in a dictionary. Note: there are multiple options
-       here that are not yet implemented.
+    Function to parse out the options and parameters from an array of 
+    command line arguments and return them in a dictionary. 
+    Note: there are multiple options here that are not yet implemented.
+
+    TODO: Switch and use a standard argument parsing library.
+
+    :param argv: The array of command line arguments recieved by the app
+    :type : Array(String), required
+
+    :returns: dictionary
+
     """
     data = argv[-1]
     column = argv[-2]
