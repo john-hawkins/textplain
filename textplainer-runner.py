@@ -3,7 +3,7 @@
  
 """Convenience wrapper for running textplain directly from source tree."""
  
-from textplain.cli import main
+from textplainer.cli import main
  
 if __name__ == '__main__':
     main()

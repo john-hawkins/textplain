@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
  
-""" textplainer.cli: provides entry point main()."""
+""" 
+   textplainer.cli: provides entry point main()
+"""
+
 import pandas as pd
 import sys
 import os
@@ -40,10 +43,10 @@ def get_cmd_line_params(argv):
     TODO: Switch and use a standard argument parsing library.
 
     :param argv: The array of command line arguments recieved by the app
-    :type : Array(String), required
+    :type argv: Array(String), required
 
-    :returns: dictionary
-
+    :returns: A dictionary of required values
+    :rtye: Dictionary
     """
     data = argv[-1]
     column = argv[-2]
@@ -51,25 +54,8 @@ def get_cmd_line_params(argv):
     options = argv[1:-3]
     result = {"dataset":data,
               "column":column, 
-              "model":model, 
-              "profanity":False, 
-              "sentiment":False, 
-              "traits":False, 
-              "rhetoric":False, 
-              "literacy":False 
+              "model":model 
     }
-    for o in options:
-        parts = o.split("=")
-        if parts[0] == "-literacy":
-            result["literacy"]=True
-        if parts[0] == "-profanity":
-            result["profanity"]=True
-        if parts[0] == "-sentiment":
-            result["sentiment"]=True
-        if parts[0] == "-traits":
-            result["traits"]=True
-        if parts[0] == "-rhetoric":
-            result["rhetoric"]=True
 
     return result
 
@@ -77,13 +63,10 @@ def get_cmd_line_params(argv):
 def print_usage(args):
     """ Command line application usage instrutions. """
     print("USAGE ")
-    print(args[0], " [ARGS] <PATH TO PICKLE SERLIALISED MODEL> <TEXT COLUMN NAME> <PATH TO TEST DATA>")
-    print("  <PATH TO PICKLE SERLIALISED MODE> - Supports models with the SciKit Learn Interface.")
-    print("  <TEXT COLUMN NAME> - Name of the column that containts text data.")
-    print("  <PATH TO TEST DATA> - File path to a dataset for which we need to explain the text value contribution.")
-#    print(" [ARGS] Switches that turn on the explanation type")
-#    print("  -profanity (Default: False) Test for the impact of profanity.")
-#    print("  -sentiment (Default: False) Test for the impact of sentiment.")
+    print(args[0], " [ARGS] <PATH TO SERLIALISED MODEL> <TEXT COLUMN NAME> <PATH TO TEST DATA>")
+    print("  <PATH TO MODEL>   - Pickled model that adheres to the Interface.")
+    print("  <COLUMN NAME>     - Name of the column that containts text data.")
+    print("  <PATH TO DATA>    - Path to a dataset to explain the text value contribution.")
     print("")
 
 

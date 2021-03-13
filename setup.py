@@ -29,7 +29,7 @@ setup(
       long_description = long_descr,
       long_description_content_type='text/markdown',
       author = "John Hawkins",
-      author_email = "hawkins.john.c@gmail.com",
+      author_email = "john@getting-data-science-done.com",
       license="MIT",
       url = "https://john-hawkins.github.io/posts/2020/10/textplainer-intuitive-explanations-for-text/",
       project_urls = {

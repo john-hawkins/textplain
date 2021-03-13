@@ -35,6 +35,9 @@ def explain_predictions(model, dataset, column, params={}):
 
     :param params: Placeholer for additional paramaters that will control output.
     :type params: dictionary, optional
+
+    :return: Return explanations as an Array with one entry per record.
+    :rtype: Array( Tuple(Int, String) )
     """
 
     if str(type(column)) != "<class 'str'>":
@@ -79,6 +82,7 @@ def explain_prediction(model, record, column, params={}):
     :return: A tuple containg the following:
        * The estimated overall impact of the text data
        * A string describing the elements of the text that contribute to the prediction  
+    :rtype: Tuple(Int, String)
     """
 
     baseline_score = model.predict(record)[0]
@@ -125,9 +129,8 @@ def deeper_explanation(model, record, column, baseline, nullscore, params):
     :param params: Placeholer for additional paramaters that will control output.
     :type params: dictionary, optional
 
-    :return: A tuple containg the following:
-       * The estimated overall impact of the text data
-       * A string describing the elements of the text that contribute to the prediction
+    :return: A string describing the elements of the text that contribute to the prediction
+    :rtype: String
     """
     textvalue = record[column].values[0]
     impact = baseline - nullscore
@@ -180,6 +183,33 @@ def sentence_explanation(model, record, column, baseline, nullscore, sentence, i
     We want to determine which words contribute most to the prediction, and what
     it is about the nature of those words. To do this we will substitute words with
     replacements from a dictionary of synonyms and antonyms.
+
+    :param model: The model to explain.
+    :type model: Model object, required
+
+    :param record: The record upon which to generate explanations of predictions.
+    :type record: <class 'pandas.core.series.Series'>, required
+
+    :param column: The name of the column in the dataset containing the text data to analyse.
+    :type column: string, required
+
+    :param baseline: The baseline score of the record.
+    :type baseline: float, required
+
+    :param nullscore: The score of the record with the text removed
+    :type nullscore: float, required
+
+    :param sentence: The sentence from within the textfield we are explaining
+    :type sentence: string, required
+
+    :param impact: The previously determined impact of the text field on this record's score
+    :type impact: float, required
+
+    :param params: Placeholer for additional paramaters that will control output.
+    :type params: dictionary, optional
+
+    :return: A string describing the elements of the text that contribute to the prediction
+    :rtype: String
     """
     # return sentence + "{{" + str(impact) + "}}"
     # Retrieve the synonyms an antonyms of all non-stop words

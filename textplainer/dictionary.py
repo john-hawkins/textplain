@@ -14,7 +14,7 @@ try:
    from nltk.corpus import wordnet
    NLTKWORDNET = True
 except:
-   eprint(" * WARNING: The complete synonym dictionary requires the wordnet corpus : nltk.download('wordnet') ")
+   eprint("* NOTE: Synonym dictionary is improved by installing wordnet : nltk.download('wordnet')")
    NLTKWORDNET = False
 
 
@@ -31,7 +31,7 @@ def load_dictionary(filename):
 
 fallows = load_dictionary("fallows.dat")
 
-###################################################################################################################
+########################################################################################
 
 def get_synonyms_and_antonyms(word):
     """
@@ -42,10 +42,11 @@ def get_synonyms_and_antonyms(word):
     if NLTKWORDNET:
         syns, ants = get_nltk_synonyms_and_antonyms(word)
     else:
-        syns, ants = ["test"], ["test"]
+        syns, ants = get_fallows_synonyms_and_antonyms(word) 
+    #["test"], ["test"]
     return syns, ants
 
-###################################################################################################################
+########################################################################################
 
 def get_nltk_synonyms_and_antonyms(word):
     synonyms = []
@@ -63,7 +64,7 @@ def get_nltk_synonyms_and_antonyms(word):
         antonyms.remove(word)
     return synonyms,antonyms
 
-###################################################################################################################
+########################################################################################
 
 def get_fallows_synonyms_and_antonyms(word, pos='x'):
     """
@@ -86,3 +87,4 @@ def get_fallows_synonyms_and_antonyms(word, pos='x'):
             ants.extend(entry['ANT'])
     return syns, ants
 
+########################################################################################
