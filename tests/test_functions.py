@@ -26,20 +26,20 @@ def test_single_word_model():
 
 ########################################################################################
 def test_multi_word_model():
-    beans_model = MultiWordModel("BeansModel", "TEXT", ["flajeolet","cannellini"])
+    mood_model = MultiWordModel("MoodsModel", "TEXT", ["happy", "sad"])
     df = pd.DataFrame({
         "ID":[1,2],
-         "TEXT":["bob only eats cannellini beans","jane likes cannellini and flajeolet beans"]
+         "TEXT":["bob is very happy today","jane is happy most mornings, but sometimes sad after school"]
     })
-    result = explain_predictions(beans_model, df, "TEXT", None)
+    result = explain_predictions(mood_model, df, "TEXT", None)
     assert len(result) == len(df), "Explain function returns results for all records"
     record_one = result[0]
     record_one_text = result[0][1]
-    assert record_one_text.__contains__("cannellini{{0.5}}"), "cannellini contribution"
+    assert record_one_text.__contains__("happy{{0.5}}"), "happy contribution"
     record_two = result[1]
     record_two_text = result[1][1]
     assert record_two_text.__contains__("{{0.5}}"), "Words with partial contribution."
-    assert record_two_text.__contains__("cannellini{{0.5}}"), "cannellini has half contribution"
+    assert record_two_text.__contains__("sad{{0.5}}"), "sad has half contribution"
 
 
 ########################################################################################

@@ -2,7 +2,6 @@ import re
 import pandas as pd
 
 from .dictionary import get_synonyms_and_antonyms
-from .dictionary import get_fallows_synonyms_and_antonyms
 
 """
    This is the core textplainer interface.
@@ -220,40 +219,44 @@ def sentence_explanation(model, record, column, baseline, nullscore, sentence, i
         syns, ants = get_synonyms_and_antonyms(w)
         for s in syns: 
             syn_subs.append( (w, s, i) )
-    df_synonyms = pd.concat([record] * len(syn_subs), ignore_index=True)
-    replace_texts = []
-    for i, x in enumerate(syn_subs):
-        word_index = x[2]
-        sub = x[1]
-        rez=words.copy()
-        rez[word_index]=sub
-        new_sent = " ".join(rez)
-        new_text = textvalue.replace(sentence, new_sent)
-        replace_texts.append(new_text)
-    df_synonyms[column] = replace_texts
-    sentence_scores = model.predict(df_synonyms)
-    impacts = baseline - sentence_scores
+    if len(syn_subs)==0:
+        result = sentence + "{{" + str(float(impact)) + "}}"
+    else:
+        df_synonyms = pd.concat([record] * len(syn_subs), ignore_index=True)
+        replace_texts = []
+        for i, x in enumerate(syn_subs):
+            word_index = x[2]
+            sub = x[1]
+            rez=words.copy()
+            rez[word_index]=sub
+            new_sent = " ".join(rez)
+            new_text = textvalue.replace(sentence, new_sent)
+            replace_texts.append(new_text)
+        df_synonyms[column] = replace_texts
+        sentence_scores = model.predict(df_synonyms)
+        impacts = baseline - sentence_scores
 
-    expltns = {el:0 for el in words}
-    current_word = words[0]
-    count = 0
-    total = 0
-    for i, x in enumerate(syn_subs):
-        this_word = x[0]
-        if this_word != current_word:
-            expltns[ current_word ] = total / count
-            count = 0
-            total = 0
-            current_word = this_word
-        total += impacts[i]
-        count += 1
-    expltns[ current_word ] = total / count
-    # NOW THAT WE HAVE THE WOR LEVEL EXPLANATIONS
-    # WE NEED TO INSERT THEM INTO THE TEXT
-    result = sentence
-    for w in words:
-        print(w, " = ", expltns[w])
-        if expltns[w]>0:
-            result = result.replace(w, w + "{{" + str(expltns[w]) + "}}" )
+        expltns = {el:0 for el in words}
+        current_word = words[0]
+        count = 0
+        total = 0
+        for i, x in enumerate(syn_subs):
+            this_word = x[0]
+            if this_word != current_word:
+                if count>0:
+                    expltns[ current_word ] = total / count
+                count = 0
+                total = 0
+                current_word = this_word
+            total += impacts[i]
+            count += 1
+        expltns[ current_word ] = total / count
+        # NOW THAT WE HAVE THE WORD LEVEL EXPLANATIONS
+        # WE NEED TO INSERT THEM INTO THE TEXT
+        result = sentence
+        for w in words:
+            print(w, " = ", expltns[w])
+            if expltns[w]>0:
+                result = result.replace(w, w + "{{" + str(expltns[w]) + "}}" )
     return result
 
