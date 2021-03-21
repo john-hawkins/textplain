@@ -17,7 +17,7 @@ class Textplain:
         self.impact = baseline - null_score
         self.abs_impact = abs(self.impact)
         self.sentences = self.break_into_sentences(textblock)
-        
+        self.create_sentence_punctuation_arrays(textblock)        
 
     def get_sentences(self):
         return self.sentences
@@ -37,14 +37,14 @@ class Textplain:
         Utility function. We want the text block broken into arrays of 
         both sentences and punctuation
         """
-        allsent = re.split( "([.?!\n]+)", textvalue )
-        self.punct = []
-        self.sents = []
-        for i,sent in enumerate(allsent):
+        self.allsent = re.split( "([.?!\n]+[ \t]*)", textvalue )
+        self.punct = {}
+        self.sents = {}
+        for i,sent in enumerate(self.allsent):
             if self.is_punct(sent):
-                self.punct.append( (i, sent) )
+                self.punct[i] = sent
             else:
-                self.sents.append( (i, sent) )
+                self.sents[i] = sent
 
     def is_punct(self, textvalue):
         """
@@ -57,5 +57,17 @@ class Textplain:
         else:
             return False
 
+    def generate_modified_textblock(self, replacement, index):
+        """
+        Generate a modified version of the text block by modifying
+        the sentence at a specific index.
+        """
+        result = ""
+        for i,sent in enumerate(self.allsent):
+            if index==i:
+                result = result + replacement
+            else:
+                result = result + sent
+        return result
 
 

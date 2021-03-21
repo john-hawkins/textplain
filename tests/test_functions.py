@@ -16,6 +16,10 @@ def test_Textplain_constructor():
     assert texty.impact == 1.0, "Impact calculated "
     assert len(texty.sentences) == 2, "Right number of sentences extracted"
 
+def test_Textplain_reconstruction():
+    texty = Textplain("My sample sentence. There are two parts.", 1, 0)
+    recon = texty.generate_modified_textblock("Final part", 2)
+    assert recon == "My sample sentence. Final part.",  "Reconstructed block with replacement"
 
 ########################################################################################
 def test_result_length():
