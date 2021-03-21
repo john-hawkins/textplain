@@ -2,11 +2,20 @@ import pandas as pd
 import numpy as np
 from textplainer.explain import explain_prediction
 from textplainer.explain import explain_predictions
+from textplainer.Textplain import Textplain
 from textplainer.ModelInterface import ModelInterface
 from textplainer.dictionary import get_synonyms_and_antonyms
 from textplainer.dictionary import get_fallows_synonyms_and_antonyms
 from .TestModels import SingleWordModel
 from .TestModels import MultiWordModel
+
+########################################################################################
+def test_Textplain_constructor():
+    texty = Textplain("My sample sentence. There are two parts.", 1, 0)
+    assert texty.baseline == 1.0,  "Member variable populated"
+    assert texty.impact == 1.0, "Impact calculated "
+    assert len(texty.sentences) == 2, "Right number of sentences extracted"
+
 
 ########################################################################################
 def test_result_length():
