@@ -14,9 +14,9 @@ class Textplain:
         self.baseline = baseline
         self.textblock = textblock
         self.null_score = null_score
-        self.impact = baseline_score - null_score
+        self.impact = baseline - null_score
         self.abs_impact = abs(self.impact)
-        self.sentences = break_into_sentences(textblock)
+        self.sentences = self.break_into_sentences(textblock)
         
 
     def get_sentences(self):
