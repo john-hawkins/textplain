@@ -7,7 +7,7 @@ import nltk
 import pickle
 import pkg_resources
 
-from .process import eprint
+from .utils import eprint
 
 try:
    nltk.data.find('wordnet')

@@ -11,6 +11,10 @@ import os
 from .explain import explain_predictions
 
 def main():
+    """
+    Main function is the entry point for the command line application.
+    It expects to find the required parameters in ```sys.argv```
+    """
     if len(sys.argv) < 2:
         print("ERROR: MISSING ARGUMENTS")
         print_usage(sys.argv)
@@ -61,7 +65,12 @@ def get_cmd_line_params(argv):
 
 #############################################################
 def print_usage(args):
-    """ Command line application usage instrutions. """
+    """ 
+    Print out the command line application usage instructions. 
+
+    :returns: Null
+    :rtye: Null
+    """
     print("USAGE ")
     print(args[0], " [ARGS] <PATH TO SERLIALISED MODEL> <TEXT COLUMN NAME> <PATH TO TEST DATA>")
     print("  <PATH TO MODEL>   - Pickled model that adheres to the Interface.")

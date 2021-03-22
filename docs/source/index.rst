@@ -13,6 +13,7 @@ string representation that can then be visualised in a range of methods.
    introduction
    installation
    usage
+   model-interface
    api
    license
 

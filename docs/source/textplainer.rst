@@ -12,6 +12,14 @@ textplainer.ModelInterface module
    :undoc-members:
    :show-inheritance:
 
+textplainer.Textplain module
+----------------------------
+
+.. automodule:: textplainer.Textplain
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 textplainer.cli module
 ----------------------
 
@@ -44,18 +52,10 @@ textplainer.models module
    :undoc-members:
    :show-inheritance:
 
-textplainer.process module
---------------------------
+textplainer.utils module
+------------------------
 
-.. automodule:: textplainer.process
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-textplainer.textcolour module
------------------------------
-
-.. automodule:: textplainer.textcolour
+.. automodule:: textplainer.utils
    :members:
    :undoc-members:
    :show-inheritance:
