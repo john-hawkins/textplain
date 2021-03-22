@@ -18,8 +18,13 @@ def test_Textplain_constructor():
 
 def test_Textplain_reconstruction():
     texty = Textplain("My sample sentence. There are two parts.", 1, 0)
-    recon = texty.generate_modified_textblock("Final part", 2)
+    recon = texty.generate_modified_textblock("Final part", 1)
     assert recon == "My sample sentence. Final part.",  "Reconstructed block with replacement"
+
+    recon = texty.generate_modified_textblock("First bit", 0)
+    assert recon == "First bit. There are two parts.",  "Reconstructed block with replacement"
+
+
 
 ########################################################################################
 def test_result_length():
