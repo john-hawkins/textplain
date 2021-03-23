@@ -136,7 +136,7 @@ class Textplain:
         """
         words = self.sents[index].split(" ")
         if len(words) == len(spec) == len(comp) == len(poly):
-            self.explanations[index] = (specificity, complexity, polarity)
+            self.explanations[index] = (spec, comp, poly)
         else:
             raise Exception('Word level explanations not equal to number of words')
 
