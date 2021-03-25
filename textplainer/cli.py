@@ -8,14 +8,15 @@ import pandas as pd
 import sys
 import os
 
-from .explain import explain_predictions
+from .models import load_and_test_model
+from .explain import explain
 
 def main():
     """
     Main function is the entry point for the command line application.
     It expects to find the required parameters in ```sys.argv```
     """
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 4:
         print("ERROR: MISSING ARGUMENTS")
         print_usage(sys.argv)
         exit(1)
@@ -27,14 +28,25 @@ def main():
             print_usage(sys.argv)
             exit(1)
 
+        if not os.path.exists(params["src"]):
+            print("ERROR: Path to src code does not exist")
+            print_usage(sys.argv)
+            exit(1)
+
         if not os.path.exists(params["dataset"]):
             print("ERROR: Testing data does not exist")
             print_usage(sys.argv)
             exit(1)
 
-        rez = explain_predictions(params["model"], params["dataset"], params["column"], params)
+        try:
+            rez = explain(params["model"], 
+                          params["src"],
+                          params["dataset"], 
+                          params["column"], params)
+            print(rez)
 
-        print(rez)
+        except Exception as err:
+            print(err)
 
 
 #############################################################
@@ -52,13 +64,15 @@ def get_cmd_line_params(argv):
     :returns: A dictionary of required values
     :rtye: Dictionary
     """
-    data = argv[-1]
-    column = argv[-2]
-    model = argv[-3]
-    options = argv[1:-3]
+    column = argv[-1]
+    data = argv[-2]
+    src = argv[-3]
+    model = argv[-4]
+    options = argv[1:-4]
     result = {"dataset":data,
               "column":column, 
-              "model":model 
+              "model":model,
+              "src":src 
     }
 
     return result
@@ -72,10 +86,15 @@ def print_usage(args):
     :rtye: Null
     """
     print("USAGE ")
-    print(args[0], " [ARGS] <PATH TO SERLIALISED MODEL> <TEXT COLUMN NAME> <PATH TO TEST DATA>")
-    print("  <PATH TO MODEL>   - Pickled model that adheres to the Interface.")
-    print("  <COLUMN NAME>     - Name of the column that containts text data.")
-    print("  <PATH TO DATA>    - Path to a dataset to explain the text value contribution.")
+    print(args[0], " [ARGS] <MODEL> <SRC> <DATA> <COLUMN>")
+    print("  <MODEL>   - Path to the pickled model. *")
+    print("  <SRC>     - Path to the src code for the model. ^")
+    print("  <DATA>    - Path to a dataset to be explained.")
+    print("  <COLUMN>  - Name of the column that contains text data.")
     print("")
+    print("NOTES: ")
+    print("  * Model must adhere to the interface defined in ModelInterface.py")
+    print("  ^ Must be a path to a directory of source code with __init__.py")
+
 
 

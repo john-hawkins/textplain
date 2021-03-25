@@ -9,12 +9,9 @@ Status - Non-Functional: In Development
 
 This is an application to analyse the contribution of a text column to the performance
 of a machine learning model. The text data could be the only feature, or one column among
-many others. This application will provide local feature impact analysis to understand
-the specific word fetaures that are pushing model predictions up or down.
-
-Additional feature flags unlock features that are more computationally intensive and
-generally domain specific.
-
+many others. The application will provide local feature impact analysis to understand
+the specific qualities of the text (at word level) that are pushing model 
+predictions either up or down.
 
 ### Distribution
 
@@ -29,7 +26,8 @@ Note: After install you will need to get spaCy to download the English model.
 sudo python3 -m spacy download en
 ```
 
-For a dictionary of synonyms and antonyms we use wordnet from NLTK
+We have built an internal synonym antonym dictionary from public access material.
+For an extended dictionary of synonyms and antonyms we use wordnet from NLTK
 You will need to install wordnet post-package-install.
 ```
 import nltk
@@ -39,9 +37,12 @@ nltk.download('wordnet')
 
 ## Usage
 
-To use the application you will need a model that adheres to a [simple interface](textplainer/ModelInterface.py)
-It should go without saying that the model will need to utilise a text column. Note that the model in this case
-should wrap around any preprocessing required on the text. You will need a raw dataset containing text that you
+To use the application you will need a model that adheres to a 
+[simple interface](textplainer/ModelInterface.py)
+It should go without saying that the model will need to utilise at
+least one text column. The model artefact should also contain
+any preprocessing required on the text. 
+You will need a raw dataset containing text that you
 want to explain how it contributes to the model output.
 
 

@@ -1,15 +1,16 @@
 import pandas as pd
 import numpy as np
+from textplainer.Textplain import Textplain
+from textplainer.explain import explain
 from textplainer.explain import explain_prediction
 from textplainer.explain import explain_predictions
-from textplainer.Textplain import Textplain
 from textplainer.ModelInterface import ModelInterface
 from textplainer.dictionary import get_synonyms_and_antonyms
 from textplainer.dictionary import get_fallows_synonyms_and_antonyms
 from .TestModels import SingleWordModel
 from .TestModels import MultiWordModel
 
-########################################################################################
+###########################################################################
 def test_Textplain_constructor():
     texty = Textplain("My sample sentence. There are two parts.", 1, 0)
     assert texty.baseline == 1.0,  "Member variable populated"
@@ -39,6 +40,16 @@ def test_single_word_model():
     df = pd.DataFrame({"ID":[1,2],"TEXT":["bob eats jellybeans","jane likes to swim"]})
     result = explain_predictions(jellybean_model, df, "TEXT", None)
     assert len(result) == len(df), "Explain function returns results for all records"
+    assert result[0][0] == 1, "First record contains discriminative word that perfectly explains output."
+    assert result[1][0] == 0, "Second record cannot be determined"
+
+########################################################################################
+def test_single_word_pickled_model():
+    model = "tests/artefacts/model.pickle"
+    dataset = "tests/artefacts/data.csv"
+    src = "tests/"
+    result = explain(model, src, dataset, "TEXT", None)
+    assert len(result) == 2, "Explain function returns results for all records"
     assert result[0][0] == 1, "First record contains discriminative word that perfectly explains output."
     assert result[1][0] == 0, "Second record cannot be determined"
 

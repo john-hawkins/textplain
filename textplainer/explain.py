@@ -1,6 +1,7 @@
 import re
 import pandas as pd
 
+from .models import load_and_test_model
 from .dictionary import get_synonyms_and_antonyms
 
 """
@@ -16,8 +17,20 @@ from .dictionary import get_synonyms_and_antonyms
    of changed contribution by the features of the model.
 """
 
-##################################################################################
+#############################################################################
 
+def explain(path_to_model, path_to_src, path_to_df, column, params={}):
+    """
+    Given all requirements as locations on the file system we want to
+    load and test the model for contribution of the sepcified text column.
+
+    """
+    model = load_and_test_model(path_to_model, path_to_src)
+    df = pd.read_csv(path_to_df)
+    return explain_predictions(model, df, column, params)
+
+
+#############################################################################
 def explain_predictions(model, dataset, column, params={}):
     """
     Explain the text data contributions to predictions made by the 
@@ -50,8 +63,9 @@ def explain_predictions(model, dataset, column, params={}):
 
     rez = [] 
     for index, record in dataset.iterrows():
-        # NOTE: We can't use the record directly because pandas produces a Series object
-        # in this form of iteration. We need to use the trick below to force it to produce
+        # NOTE: We can't use the record directly because pandas produces 
+        # a Series object in this form of iteration. 
+        # We need to use the trick below to force it to produce
         # a single record DataFrame
         rez.append(explain_prediction(model, dataset.loc[index:index], column, params))
 
@@ -60,10 +74,10 @@ def explain_predictions(model, dataset, column, params={}):
 ##################################################################################
 
 def explain_prediction(model, record, column, params={}):
-    print(type(record))
     """
-    Explain an individual record in terms of the contributions made by a specific
-    column of text data within that record. We look at the predictions made by the
+    Explain an individual record in terms of the contributions 
+    made by a specific column of text data within that record. 
+    We look at the predictions made by the
     given model on the provided dataset.
 
     :param model: The model to explain.
@@ -90,9 +104,10 @@ def explain_prediction(model, record, column, params={}):
     null_score = model.predict(null_record)[0]
     impact = baseline_score - null_score 
     if impact == 0:
-        # We have a text field that does not change the prediction from an empty string
-        # Do not waste time analysing this any further
-        # TODO: Parameterize this threshold
+        # We have a text field that does not change the prediction 
+        # from an empty string
+        # We do not waste time analysing this any further.
+        # TODO: Parameterize this threshold rather than har code as zero.
         return impact, record[column].values[0]
     else:
         # The impact is non-zero so do further analysis. Deeper analysis
@@ -106,8 +121,9 @@ def explain_prediction(model, record, column, params={}):
 
 def deeper_explanation(model, record, column, baseline, nullscore, params):
     """
-    This function is called once we have established that the text data is contributing
-    to the model outcome. We now investigate what it is about the text that makes that
+    This function is called once we have established that the text data 
+    is contributing to the model outcome. 
+    We now investigate what it is about the text that makes that
     contribution.
 
     :param model: The model to explain.
