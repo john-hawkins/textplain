@@ -1,11 +1,10 @@
 textplainer
 ----------
+> :warning: **Non-Functional**: This project is under development.
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![build](https://github.com/john-hawkins/textplainer/workflows/Build/badge.svg)
 
-```
-Status - Non-Functional: In Development
-```
 
 This is an application to analyse the contribution of a text column to the performance
 of a machine learning model. The text data could be the only feature, or one column among
