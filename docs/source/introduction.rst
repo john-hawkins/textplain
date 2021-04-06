@@ -1,5 +1,7 @@
 Introduction
 ============
+.. warning::
+   This project is non-functional. It is under active development.
 
 ``Textplainer`` is a Python package and application which allows you to explain
 the contributions of text data to machine learning models.

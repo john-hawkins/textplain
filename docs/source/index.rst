@@ -1,5 +1,7 @@
 Textplainer: Explain text contributions to ML Models
 ====================================================
+.. warning::
+   This project is non-functional. It is under active development.
 
 Textplainer is a package and command line application that will
 permit you to query a trained machine learning model

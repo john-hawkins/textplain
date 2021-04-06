@@ -1,5 +1,7 @@
 Installation
 ============
+.. warning::
+   This project is non-functional. It is under active development.
 
 The Textplainer package is maintained inside the PyPi package manager.
 
