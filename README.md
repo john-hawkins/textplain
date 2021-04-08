@@ -81,4 +81,10 @@ Now, the ``textplainer`` command is available::
 textplainer mymodel.pkl question data/test.csv > output.txt
 ```
 
+# Acknowledgements
+
+Python package built using the
+[bootstrap cmdline template](https://github.com/jgehrcke/python-cmdline-bootstrap)
+ by [jgehrcke](https://github.com/jgehrcke)
+
 
