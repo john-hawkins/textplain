@@ -1,0 +1,179 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsfonts}
+\usepackage{algorithm2e}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amscd}
+\usepackage{booktabs}
+\usepackage[latin2]{inputenc}
+\usepackage{t1enc}
+\usepackage[mathscr]{eucal}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{graphics}
+\numberwithin{equation}{section}
+\usepackage{hyperref}
+\usepackage[margin=2.9cm]{geometry}
+\usepackage[tableposition = top]{caption}
+\usepackage[outdir=./images/]{epstopdf}
+\epstopdfsetup{outdir=./images/}
+
+\def\numset#1{{\\mathbb #1}}
+
+\begin{document}
+ 
+\title{Textplainer: Text Feature Explanations for Arbitrary Machine Learning Models}
+
+\author{John Hawkins} 
+
+\maketitle
+
+\section{Abstract}
+
+Explaining what contributes to the output of machine learning models is of increasing importance in
+a world where machine learning is embedded in critical decision making processes. In spite of recent advances in
+the explainability of model decisions, complex structured data like raw text remains difficult to explain.
+
+In this work we present a system for explaining some of the contributions of text to machine learning models
+in a manner that is sensitive to some of the specific qualities of text. We lay the ground work for additional
+work to expand this technique and provide context specific explanation of the way text is utilised in a machine
+learning system.
+
+We have made the code available in an Open Source GitHub repository 
+available at \href{https://github.com/john-hawkins/textplainer}{https://github.com/john-hawkins/textplainer}
+and released using the PyPi library. 
+
+
+\section{Introduction}
+
+Explaining how each individual data point or feature contributes to the output of a machine learning model is 
+critical to both the analysis of the model during its development, the scutiny of the model during review and 
+often to its ongoing use in production. The contributions of features are typically analysed at two different
+scales, global feature importance and local feature importance. The global importance simply tells us over a large 
+set of predictions the extent to which an individual feature is contributing to predictions. It is a measure of overall
+importance, but typically tells us very little about individual predictions.
+
+By contrast, local feature importance refers to a range of techniques that seek to explain the contribution of a given
+value of a specific variable to the output of a model on a case by case basis. In a linear model this is a trivial task
+because the answer can be gleaned by simply inspecting the coefficients of the model. For complex non-linear models
+this is considerably more difficult. In recent years techniques like Lime\cite{lime}, Xemp\cite{xemp} and Shap\cite{shap}
+have made great in-roads into
+delivering similar kinds of insights into non-linear machine learning models but none of them make satisfactory progress
+with raw text. The reason being that they all require that we are able to reference the contribution of the variable to
+its mean value, local mean value or some sample of other values. Text data, because of its extremely high dimensionality,
+does not work well with these techniques. They can be applied to the processed data, i.e. to the features extracted from
+the text but this does not improve the quality of the explanations because they are extremely high dimensional vector
+spaces far-removed from human comprehension.
+
+There has been considerable work done to try and build models with improved explainability for text variables. 
+Arras et al XXX design an algorithm that XXX \cite{Arras2017}. In all of these cases the authors are designing a specific machine learning algorithm
+with improved explainability features, rather than explaining the performance of existing models.
+
+Part of the key difficulty of explaining how text contributes to a model is that there are an open ended number of ways in
+which the text can vary. There are multiple conceptual levels at which a human might analyse the features of the text
+to understand the relationship between the tokens, the meaning and  the intention. By way of example, all of the following
+are potential explanations of why a text might be "difficult to understand" which is a potential real-world application of a
+text classifier.
+
+\begin{itemize}
+   \item "There are too many weird and unusual words in this article."
+   \item "The sentences are all very long and structurally complex."
+   \item "There are so many spelling and grammatical mistakes I cannot concentrate on understanding it."
+\end{itemize}
+
+This list is by no means exhaustive and should only hint at the complexity of the problem. In order to make progress with this task we
+present a technqiue for analysing the component contributions of the words in a text across four key dimensions: length, existance,
+specificty and polarity (LESP). The result is a human readable illustration of how text contributes to the predictions made by a model
+across these four dimensions, which should assist the user in deriving higher level explanations. 
+
+
+\section{Method}
+
+The essence of many of the local feature importance techniques is to illustrate how much the prediction of the model would have been
+different if the value of the specific variable had been missing or given an average value. This difference from some kind of neutral
+value is more conceptually difficult with text. Replacing the text with a null value will give you a sense of the overall contribution
+of the text (presuming the model can cope with this), however, it does nothing to explain what it is about the text that is making the
+observed contribution relative to the null.
+
+We start our analysis by calculating the diffence between the record scored with the true value and the record scored with the value replaced
+with an empty string. The choice of the empty string is a deliberate choice to avoid the complication that NULL records are sometimes used
+by systems to indicate the absence of particular actions in the system that recorded them. The goal of the technique is to explain the individual
+contributions inside the text to the overall text.
+
+Due to the fact that the potential number of contributing structures in the text is computationally prohibitive, our first goal is to identify
+those tokens in the text that contribute the most through their existance. We do so by re-scoring the record with all each of the word tokens
+removed individually. This has a computational complexity capped at the length of the text (by default we exclude stop-words), and we can
+achieve additional computational gains by pre-generating these records and scoring them all in parrallel. The contribution of token's
+existance ($E$ for word $W_i$ is calculated as shown in Equation \ref{eq:E}
+
+\begin{equation}
+\label{eq:E}
+E(W_i) = \frac{ f(\mathscr{T}) - f( d(\mathscr{T},i) ) }{ f(\mathscr{T}) - f(\epsilon) }
+\end{equation}
+
+Where our arbitray machine learning model is demarcated by the function $f()$, which for our purposes will operate on a text block $\mathscr{T}$.
+We ignore all other variables passed to the model as they remain constant throughout this analysis. The function $d$ will delete the $i^{th}$ word
+token from the text sequence, and $\epsilon$ is the empty string.
+
+We then sort the values of $E$ for the individual word tokens and take the top $N$. These word tokens form the basis for all additional analysis
+and limit the computational search space. Alternatively, this can be set to take all word tokens that contribute above a threshold proportion of the
+overall text contribution.
+
+In order to calculate the remaining scores for the key word tokens we need to match them against a custom dictionary of synonyms and antonyms. This
+dictionary has been derived from the project gutenberg copy of Samuel Fallows dictionary of synonymns \cite{fallows}. We have processed this dictionary
+into a data structure such that we are able to retrieve a list of synonyms and antonyms for each word token in the list. In addition we have added entries for a range of common mispellings. We then generate new entries for the record in which the word token is replaced by all of the synonyms and antonyms. These
+are scored in parrallel as per the existance round. The scores for $I$ and $P$ are calculated as show in Equations \ref{eq:I} and \ref{eq:P} respectively.
+
+
+\begin{equation}
+\label{eq:I}
+I(W_i) = \frac{ f(\mathscr{T}) - \frac{ \sum_{s=1}^{|\mathcal{S}|} f( r(\mathscr{T},i,\mathcal{S}_s) )}{|\mathcal{S}|} }{ f(\mathscr{T}) - f( d(\mathscr{T},i) ) }
+\end{equation}
+  
+\begin{equation}
+\label{eq:P}
+P(W_i) = \frac{ f(\mathscr{T}) - \frac{ \sum_{a=1}^{|\mathcal{A}|} f( r(\mathscr{T},i,\mathcal{A}_a) )}{|\mathcal{A}|} }{ f(\mathscr{T}) - f( d(\mathscr{T},i) ) }
+\end{equation}
+
+Where $\mathcal{S}$ and $\mathcal{A}$ are the sets of synonyms and antonyms for word token $i$ respectively, and the function $r(\mathscr{T},i,w)$ will 
+replace the $i^{th}$ word token with $w$. 
+These metrics represent the difference between the contribution of the word found in the text and the average impact of its synonyms or antonyms
+on the output of the model.  In both cases these metrics are calculated relative to the numerator of the \textit{existance} metric so that
+their contribution is relative to the presence of the word, rather than the presence of the entire text.
+
+
+\section{Experiments}
+
+To demonstrate the textplain technique we have built models on two public domain datasets using multiple different machine learning techniques.
+%The datasets are the Amazon Fine Food reviews by McAuley and Leskovec \cite{McAuley2013},
+The datasets are the Sentiment140 Twitter sentiment data and by Go, Bhayani and
+Huang \cite{Go2009} and the dataset of SMS Spam by Almeida and Gómez Hidalgo \cite{Almeida2011}. 
+In the first problem we are predicting the sentiment of a tweet from its text content where the label was derived from an emoticon in the 
+original tweet. In effect this amounts to predicting the sentiment of the emoticon that will be added to a tweet from its text.
+In the second case we are predicting which SMS messages are spam from the message text itself.
+
+To illustrate the effectiveness of textplain on diverse machine learning models we apply the following three
+machine learning pipelines to each dataset.
+
+\begin{enumerate}
+   \item A bi-gram encoding of the text with TFIDF encoding used to train a regularized logistic regression.
+   \item A neural network with a learned embedding trained directly from a vector of word tokens 
+   \item A BERT derived classifier.
+\end{enumerate}
+  
+
+
+
+\section{Results}
+
+
+\section{Discussion}
+
+
+\bibliographystyle{splncs}
+\bibliography{refs}
+
+\end{document}
+
+
